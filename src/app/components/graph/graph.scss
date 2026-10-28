@@ -1,0 +1,91 @@
+.layout {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: minmax(0, 360px) minmax(0, 1fr);
+  align-items: start;
+}
+
+.list {
+  list-style: none;
+  margin: 0 0 12px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.fn-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  .input {
+    flex: 1;
+    min-width: 0;
+  }
+}
+
+.swatch {
+  flex: none;
+  display: inline-block;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+
+  &.hidden {
+    opacity: 0.3;
+  }
+}
+
+.add {
+  width: 100%;
+}
+
+.examples {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-top: 12px;
+
+  .btn {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+  }
+}
+
+.evaluate-title {
+  margin-top: 20px;
+}
+
+.values {
+  width: 100%;
+  margin-top: 10px;
+  border-collapse: collapse;
+  font-family: var(--font-mono);
+  font-size: 0.9rem;
+
+  th,
+  td {
+    padding: 6px 4px;
+    border-bottom: 1px solid var(--border);
+    text-align: left;
+    font-weight: 600;
+    overflow-wrap: anywhere;
+  }
+
+  td {
+    text-align: right;
+    font-weight: 700;
+  }
+}
+
+@media (max-width: 860px) {
+  .layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .plot {
+    order: -1;
+  }
+}

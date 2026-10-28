@@ -1,0 +1,68 @@
+<section class="bezel" aria-label="Calculator display">
+  <div class="lcd">
+    <div class="annunciators" aria-label="Active settings">
+      @if (showAngleMode()) {
+        <span
+          class="ann"
+          [class.on]="angleMode() === 'DEG'"
+          [attr.aria-hidden]="angleMode() !== 'DEG'"
+          >DEG</span
+        >
+        <span
+          class="ann"
+          [class.on]="angleMode() === 'RAD'"
+          [attr.aria-hidden]="angleMode() !== 'RAD'"
+          >RAD</span
+        >
+        <span class="ann" [class.on]="second()" [attr.aria-hidden]="!second()">2nd</span>
+      }
+      <span
+        class="ann"
+        [class.on]="memory() !== null"
+        [attr.aria-hidden]="memory() === null"
+        [title]="memory() !== null ? 'Memory: ' + memory() : ''"
+      >
+        M<span class="sr-only"> (memory holds {{ memory() }})</span>
+      </span>
+      <button
+        type="button"
+        class="copy"
+        (click)="copy()"
+        [attr.aria-label]="copied() ? 'Copied result' : 'Copy result'"
+      >
+        {{ copied() ? 'COPIED' : 'COPY' }}
+      </button>
+    </div>
+
+    <p class="expression" aria-label="Expression">
+      @if (showingResult() || preview()) {
+        {{ expression() }}<span class="ghost" aria-hidden="true">{{ pendingParens() }}</span>
+        @if (showingResult()) {
+          <span aria-hidden="true"> =</span>
+        }
+      } @else {
+        &nbsp;
+      }
+    </p>
+
+    <output
+      #output
+      class="main {{ sizeClass() }}"
+      [class.preview]="!showingResult() && !!preview()"
+      tabindex="0"
+      aria-live="polite"
+      aria-label="Result"
+      (keydown)="onOutputKeydown($event)"
+      >{{ mainText() }}
+      @if (!showingResult() && !preview() && pendingParens()) {
+        <span class="ghost" aria-hidden="true">{{ pendingParens() }}</span>
+      }
+    </output>
+  </div>
+
+  @if (error(); as message) {
+    <p class="error-message" role="alert">{{ message }}</p>
+  } @else if (notice(); as message) {
+    <p class="notice" role="status">{{ message }}</p>
+  }
+</section>

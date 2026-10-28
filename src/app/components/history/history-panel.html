@@ -1,0 +1,53 @@
+<section class="history" aria-labelledby="history-title">
+  <div class="header">
+    <h2 id="history-title">History</h2>
+    <button
+      type="button"
+      class="btn small"
+      (click)="history.clear()"
+      [disabled]="history.entries().length === 0"
+    >
+      Clear history
+    </button>
+  </div>
+
+  @if (history.entries().length === 0) {
+    <p class="empty">No calculations yet. Results appear here after you press =.</p>
+  } @else {
+    <ol class="entries">
+      @for (entry of history.entries(); track entry.id) {
+        <li>
+          <button
+            type="button"
+            class="expr"
+            (click)="useExpression.emit(entry)"
+            [attr.aria-label]="'Edit expression ' + entry.expression"
+          >
+            {{ entry.expression }}
+          </button>
+          <button
+            type="button"
+            class="res"
+            (click)="useResult.emit(entry)"
+            [attr.aria-label]="'Insert result ' + entry.result"
+          >
+            = {{ entry.result }}
+          </button>
+        </li>
+      }
+    </ol>
+  }
+
+  <label class="persist">
+    <input
+      type="checkbox"
+      [checked]="settings.persistHistory()"
+      (change)="settings.persistHistory.set($any($event.target).checked)"
+    />
+    Save history on this device
+  </label>
+  <p class="hint">
+    Tap an expression to edit it, or a result to insert it. Last 50 kept, stored only in this
+    browser.
+  </p>
+</section>

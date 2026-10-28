@@ -21,6 +21,13 @@
           "builder": "@angular/build:application",
           "options": {
             "browser": "src/main.ts",
+            "allowedCommonJsDependencies": [
+              "typed-function",
+              "javascript-natural-sort",
+              "tiny-emitter",
+              "escape-latex",
+              "seedrandom"
+            ],
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "scss",
             "assets": [
@@ -43,8 +50,8 @@
                 },
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "4kB",
-                  "maximumError": "8kB"
+                  "maximumWarning": "6kB",
+                  "maximumError": "12kB"
                 }
               ],
               "outputHashing": "all"
@@ -70,7 +77,10 @@
           "defaultConfiguration": "development"
         },
         "test": {
-          "builder": "@angular/build:unit-test"
+          "builder": "@angular/build:unit-test",
+          "options": {
+            "setupFiles": ["src/test-setup.ts"]
+          }
         }
       }
     }

@@ -1,0 +1,81 @@
+<div class="layout" [class.with-history]="settings.historyOpen()">
+  <section
+    class="device"
+    [attr.aria-label]="scientific() ? 'Scientific calculator' : 'Basic calculator'"
+  >
+    <div class="brand-row" aria-hidden="true">
+      <div class="brand">
+        <span class="model">PINK · SC-25</span>
+        <span class="kind">{{
+          scientific() ? 'Scientific calculator' : 'Electronic calculator'
+        }}</span>
+      </div>
+      <div class="solar"><span></span><span></span><span></span><span></span></div>
+    </div>
+
+    <div class="toolbar">
+      @if (scientific()) {
+        <div class="segmented" role="radiogroup" aria-label="Angle mode">
+          <button
+            type="button"
+            role="radio"
+            [attr.aria-checked]="settings.angleMode() === 'DEG'"
+            (click)="settings.angleMode.set('DEG')"
+          >
+            DEG
+          </button>
+          <button
+            type="button"
+            role="radio"
+            [attr.aria-checked]="settings.angleMode() === 'RAD'"
+            (click)="settings.angleMode.set('RAD')"
+          >
+            RAD
+          </button>
+        </div>
+      } @else {
+        <span class="mode-name">Basic</span>
+      }
+      <button
+        type="button"
+        class="btn small shell-btn"
+        [attr.aria-pressed]="settings.historyOpen()"
+        aria-controls="history-panel"
+        (click)="settings.historyOpen.set(!settings.historyOpen())"
+      >
+        {{ settings.historyOpen() ? 'Hide history' : 'Show history' }}
+      </button>
+    </div>
+
+    <app-calculator-display
+      [expression]="calc.expression()"
+      [pendingParens]="calc.pendingParens()"
+      [preview]="calc.preview()"
+      [result]="calc.result()"
+      [notice]="calc.notice()"
+      [angleMode]="settings.angleMode()"
+      [showAngleMode]="scientific()"
+      [memory]="calc.memory()"
+      [second]="scientific() && calc.second()"
+    />
+
+    <app-calculator-keypad
+      [scientific]="scientific()"
+      [second]="calc.second()"
+      (pressed)="calc.dispatch($event)"
+    />
+
+    <p class="hint keyboard-hint">
+      Keyboard: digits, + − * / ^ ( ) %, Enter to evaluate, Backspace to delete, Esc to clear.
+    </p>
+  </section>
+
+  @if (settings.historyOpen()) {
+    <aside id="history-panel" class="card history">
+      <app-history-panel
+        (useResult)="calc.useHistoryResult($event)"
+        (useExpression)="calc.restoreHistoryExpression($event)"
+      />
+    </aside>
+  }
+</div>

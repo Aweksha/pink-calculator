@@ -1,0 +1,119 @@
+.layout {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: minmax(0, 520px);
+  justify-content: center;
+  align-items: start;
+
+  &.with-history {
+    grid-template-columns: minmax(0, 520px) minmax(0, 320px);
+  }
+}
+
+/* The calculator body: a moulded shell with a lit top edge and a darker base. */
+.device {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 20px 20px 18px;
+  border-radius: 32px 32px 44px 44px;
+  background: linear-gradient(170deg, var(--shell-top), var(--shell-bottom));
+  border: 1px solid var(--shell-edge);
+  box-shadow:
+    inset 0 2px 0 rgba(255, 255, 255, 0.45),
+    inset 0 -6px 0 rgba(0, 0, 0, 0.08),
+    0 18px 40px rgba(121, 52, 77, 0.22),
+    0 4px 10px rgba(121, 52, 77, 0.12);
+  color: var(--shell-text);
+}
+
+.brand-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 0 4px;
+}
+
+.brand {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+}
+
+.model {
+  font-weight: 900;
+  font-style: italic;
+  letter-spacing: 0.06em;
+  font-size: 1.05rem;
+}
+
+.kind {
+  font-size: 0.68rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.16em;
+  opacity: 0.8;
+}
+
+/* Decorative solar strip. */
+.solar {
+  display: flex;
+  gap: 2px;
+  padding: 3px;
+  border-radius: 6px;
+  background: var(--solar-line);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.4);
+
+  span {
+    width: 26px;
+    height: 16px;
+    border-radius: 2px;
+    background: linear-gradient(160deg, var(--solar), var(--solar-line));
+  }
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.mode-name {
+  font-size: 0.75rem;
+  font-weight: 900;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+}
+
+.shell-btn {
+  background: var(--key-digit);
+  border-color: var(--key-digit-edge);
+  color: var(--key-digit-text);
+}
+
+.keyboard-hint {
+  margin: 0;
+  text-align: center;
+  color: var(--shell-text);
+  opacity: 0.85;
+}
+
+@media (max-width: 900px) {
+  .layout.with-history {
+    grid-template-columns: minmax(0, 520px);
+  }
+}
+
+@media (max-width: 400px) {
+  .device {
+    padding: 14px 12px 14px;
+    border-radius: 24px 24px 32px 32px;
+  }
+
+  .solar span {
+    width: 18px;
+  }
+}

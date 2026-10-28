@@ -1,0 +1,49 @@
+<div class="keypad">
+  <div class="grid memory" role="group" aria-label="Memory">
+    @for (key of memoryKeys; track key.label) {
+      <button type="button" class="key memory" [attr.aria-label]="key.aria" (click)="press(key)">
+        {{ key.label }}
+      </button>
+    }
+  </div>
+
+  @if (scientific()) {
+    <div class="grid scientific" role="group" aria-label="Scientific functions">
+      @for (key of scientificKeys; track key.label) {
+        @let shown = view(key);
+        <div class="slot">
+          <!-- Secondary function printed above the key, as on a hardware calculator. -->
+          <span class="alt" [class.active]="second() && key.second" aria-hidden="true">
+            {{ key.second ? (second() ? key.label : key.second.label) : '' }}
+          </span>
+          <button
+            type="button"
+            class="key {{ key.variant }}"
+            [class.second-key]="key.action.kind === 'second'"
+            [class.toggled]="key.action.kind === 'second' && second()"
+            [attr.aria-pressed]="key.action.kind === 'second' ? second() : null"
+            [attr.aria-label]="shown.aria"
+            [title]="shown.aria"
+            (click)="press(key)"
+          >
+            {{ shown.label }}
+          </button>
+        </div>
+      }
+    </div>
+  }
+
+  <div class="grid basic" role="group" aria-label="Numbers and operators">
+    @for (key of basicKeys; track key.label) {
+      <button
+        type="button"
+        class="key {{ key.variant }}"
+        [style.grid-column]="key.span ? 'span ' + key.span : null"
+        [attr.aria-label]="key.aria"
+        (click)="press(key)"
+      >
+        {{ key.label }}
+      </button>
+    }
+  </div>
+</div>

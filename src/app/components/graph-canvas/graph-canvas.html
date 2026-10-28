@@ -1,0 +1,38 @@
+<div class="graph">
+  <canvas
+    #canvas
+    tabindex="0"
+    role="img"
+    [attr.aria-label]="
+      label() +
+      '. Drag to pan, scroll or pinch to zoom. Keyboard: arrow keys pan, plus and minus zoom, 0 resets, shift plus arrow keys trace.'
+    "
+    (wheel)="onWheel($event)"
+    (pointerdown)="onPointerDown($event)"
+    (pointermove)="onPointerMove($event)"
+    (pointerup)="onPointerUp($event)"
+    (pointercancel)="onPointerUp($event)"
+    (pointerleave)="onPointerLeave($event)"
+    (keydown)="onKeydown($event)"
+  ></canvas>
+
+  <div class="controls" role="group" aria-label="Graph view controls">
+    <button type="button" class="btn icon small" (click)="zoomIn()" aria-label="Zoom in">+</button>
+    <button type="button" class="btn icon small" (click)="zoomOut()" aria-label="Zoom out">
+      −
+    </button>
+    <button type="button" class="btn small" (click)="reset()">Reset</button>
+  </div>
+
+  @if (traceX() !== null && traceValues().length) {
+    <div class="trace" aria-live="polite">
+      <span class="trace-x">x = {{ traceLabel() }}</span>
+      @for (item of traceValues(); track item.id) {
+        <span class="trace-y">
+          <span class="swatch" [style.background]="item.color" aria-hidden="true"></span>
+          {{ item.label }}: {{ formatValue(item.y) }}
+        </span>
+      }
+    </div>
+  }
+</div>

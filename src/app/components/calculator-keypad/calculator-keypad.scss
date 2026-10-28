@@ -1,0 +1,151 @@
+.keypad {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px 9px;
+}
+
+.scientific {
+  row-gap: 2px;
+}
+
+.slot {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.alt {
+  height: 15px;
+  font-size: 0.68rem;
+  font-weight: 800;
+  line-height: 15px;
+  text-align: center;
+  color: var(--key-alt-label);
+  opacity: 0.85;
+
+  &.active {
+    color: var(--shell-text);
+    opacity: 0.6;
+  }
+}
+
+/*
+ * Raised keys: the solid bottom shadow is the key's side wall. Pressing moves the cap down
+ * by the wall height, so the key looks pushed into the shell.
+ */
+.key {
+  --face: var(--key-digit);
+  --edge: var(--key-digit-edge);
+  --depth: 4px;
+
+  position: relative;
+  min-height: 52px;
+  min-width: 0;
+  padding: 4px;
+  border: 0;
+  border-radius: 12px 12px 14px 14px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0) 55%), var(--face);
+  color: var(--key-digit-text);
+  font-size: 1.25rem;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow:
+    0 var(--depth) 0 var(--edge),
+    0 calc(var(--depth) + 3px) 6px rgba(60, 20, 35, 0.25);
+  touch-action: manipulation;
+  user-select: none;
+  transition:
+    transform 60ms ease,
+    box-shadow 60ms ease,
+    filter var(--transition);
+
+  &:hover {
+    filter: brightness(1.04);
+  }
+
+  &:active {
+    transform: translateY(var(--depth));
+    box-shadow:
+      0 0 0 var(--edge),
+      0 1px 2px rgba(60, 20, 35, 0.25);
+  }
+
+  &.operator {
+    --face: var(--key-op);
+    --edge: var(--key-op-edge);
+    color: var(--key-op-text);
+  }
+
+  &.action {
+    --face: var(--key-action);
+    --edge: var(--key-action-edge);
+    color: var(--key-action-text);
+  }
+
+  &.function {
+    --face: var(--key-fn);
+    --edge: var(--key-fn-edge);
+    color: var(--key-fn-text);
+    font-size: 1rem;
+  }
+
+  &.second-key {
+    --face: var(--key-second);
+    --edge: var(--key-second-edge);
+    color: var(--key-second-text);
+  }
+
+  &.equals {
+    --face: var(--key-equals);
+    --edge: var(--key-equals-edge);
+    color: var(--key-equals-text);
+    font-size: 1.7rem;
+  }
+
+  &.memory {
+    --face: var(--key-op);
+    --edge: var(--key-op-edge);
+    --depth: 3px;
+    min-height: 34px;
+    border-radius: 999px;
+    color: var(--key-op-text);
+    font-size: 0.8rem;
+    letter-spacing: 0.04em;
+  }
+
+  &.toggled {
+    transform: translateY(calc(var(--depth) - 1px));
+    box-shadow:
+      0 1px 0 var(--edge),
+      inset 0 0 0 2px var(--key-equals-edge);
+  }
+}
+
+.scientific .key {
+  min-height: 42px;
+}
+
+@media (max-width: 380px) {
+  .grid {
+    gap: 8px 6px;
+  }
+
+  .key {
+    font-size: 1.05rem;
+
+    &.function {
+      font-size: 0.85rem;
+    }
+  }
+
+  .alt {
+    font-size: 0.6rem;
+  }
+}

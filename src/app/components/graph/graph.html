@@ -1,0 +1,106 @@
+<div class="page-heading">
+  <h1>Graph</h1>
+  <p>
+    Plot functions of x. Drag to pan, scroll or pinch to zoom, and hover or tap to trace values.
+  </p>
+</div>
+
+<div class="layout">
+  <section class="card functions" aria-labelledby="functions-title">
+    <h2 id="functions-title" class="card-title">Functions</h2>
+    <ul class="list">
+      @for (f of graph.functions(); track f.id; let i = $index) {
+        <li>
+          <div class="fn-row">
+            <span
+              class="swatch"
+              [style.background]="f.color"
+              [class.hidden]="!f.visible"
+              aria-hidden="true"
+            ></span>
+            <label class="sr-only" [for]="'fn-' + f.id">Function {{ i + 1 }}</label>
+            <input
+              class="input"
+              [id]="'fn-' + f.id"
+              [value]="f.text"
+              placeholder="y = x^2"
+              spellcheck="false"
+              autocomplete="off"
+              [attr.aria-invalid]="!!f.error"
+              [attr.aria-describedby]="f.error ? 'fn-error-' + f.id : null"
+              (change)="graph.update(f.id, text($event))"
+              (keydown.enter)="graph.update(f.id, text($event))"
+            />
+            <button
+              type="button"
+              class="btn icon small"
+              [attr.aria-pressed]="f.visible"
+              [attr.aria-label]="(f.visible ? 'Hide ' : 'Show ') + 'function ' + (i + 1)"
+              [title]="f.visible ? 'Hide' : 'Show'"
+              (click)="graph.toggle(f.id)"
+            >
+              {{ f.visible ? '👁' : '◌' }}
+            </button>
+            <button
+              type="button"
+              class="btn icon small"
+              [attr.aria-label]="'Remove function ' + (i + 1)"
+              title="Remove"
+              (click)="graph.remove(f.id)"
+            >
+              ✕
+            </button>
+          </div>
+          @if (f.error) {
+            <p class="error-message" [id]="'fn-error-' + f.id" role="alert">{{ f.error }}</p>
+          }
+        </li>
+      }
+    </ul>
+    <button type="button" class="btn primary add" (click)="graph.add()">+ Add function</button>
+
+    <div class="examples">
+      <span class="hint">Try:</span>
+      @for (example of examples; track example) {
+        <button type="button" class="btn small" (click)="graph.add(example)">{{ example }}</button>
+      }
+    </div>
+
+    <h2 class="card-title evaluate-title">Value at x</h2>
+    <div class="field">
+      <label for="eval-x">x =</label>
+      <input
+        id="eval-x"
+        class="input"
+        [value]="evalAt()"
+        (input)="evalAt.set(text($event))"
+        [attr.aria-invalid]="!evaluation().ok"
+      />
+    </div>
+    @let ev = evaluation();
+    @if (ev.ok) {
+      <table class="values">
+        <tbody>
+          @for (row of ev.rows; track row.id) {
+            <tr>
+              <th scope="row">
+                <span class="swatch" [style.background]="row.color" aria-hidden="true"></span>
+                {{ row.text }}
+              </th>
+              <td>{{ row.value }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    } @else {
+      <p class="error-message" role="alert">{{ ev.error }}</p>
+    }
+    <p class="hint">
+      Trigonometric functions use radians in the graph. log(x) is base 10, ln(x) is natural log.
+    </p>
+  </section>
+
+  <section class="plot" aria-label="Graph">
+    <app-graph-canvas [series]="graph.series()" />
+  </section>
+</div>

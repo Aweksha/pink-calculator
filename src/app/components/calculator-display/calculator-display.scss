@@ -1,0 +1,116 @@
+/* Dark plastic bezel around a recessed, slightly tinted LCD panel. */
+.bezel {
+  padding: 10px;
+  border-radius: 18px;
+  background: var(--lcd-bezel);
+  box-shadow:
+    inset 0 2px 4px rgba(0, 0, 0, 0.45),
+    0 1px 0 rgba(255, 255, 255, 0.35);
+}
+
+.lcd {
+  position: relative;
+  min-height: 140px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 8px 14px 10px;
+  border-radius: 10px;
+  text-align: right;
+  color: var(--lcd-ink);
+  background:
+    repeating-linear-gradient(0deg, transparent 0 2px, rgba(0, 0, 0, 0.018) 2px 3px),
+    linear-gradient(180deg, var(--lcd-bg), var(--lcd-bg-2));
+  box-shadow:
+    inset 0 3px 8px rgba(0, 0, 0, 0.22),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.annunciators {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 22px;
+  font-family: var(--font-lcd);
+  font-size: 0.8rem;
+  letter-spacing: 0.06em;
+}
+
+/* Inactive indicators stay faintly visible, like unlit LCD segments. */
+.ann {
+  color: var(--lcd-dim);
+  transition: color var(--transition);
+
+  &.on {
+    color: var(--lcd-ink);
+  }
+}
+
+.copy {
+  margin-left: auto;
+  min-height: 24px;
+  padding: 0 6px;
+  border: 1px solid var(--lcd-dim);
+  border-radius: 4px;
+  background: transparent;
+  font-family: var(--font-lcd);
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  color: var(--lcd-ink);
+  cursor: pointer;
+
+  &:hover {
+    background: var(--lcd-dim);
+  }
+}
+
+.expression {
+  margin: 8px 0 0;
+  min-height: 1.5em;
+  font-family: var(--font-lcd);
+  font-size: 1.1rem;
+  opacity: 0.75;
+  overflow-wrap: anywhere;
+}
+
+.main {
+  display: block;
+  font-family: var(--font-lcd);
+  font-size: 2.9rem;
+  line-height: 1.1;
+  overflow-wrap: anywhere;
+  user-select: text;
+  border-radius: 6px;
+  font-variant-numeric: tabular-nums;
+  text-shadow: 1px 1px 0 var(--lcd-dim);
+
+  &.md {
+    font-size: 2.2rem;
+  }
+  &.sm {
+    font-size: 1.65rem;
+  }
+  &.xs {
+    font-size: 1.25rem;
+  }
+  &.preview {
+    opacity: 0.55;
+  }
+}
+
+.ghost {
+  opacity: 0.35;
+}
+
+.error-message {
+  margin: 8px 0 0;
+  text-align: left;
+}
+
+.notice {
+  margin: 8px 2px 0;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--key-fn-text);
+  text-align: left;
+}

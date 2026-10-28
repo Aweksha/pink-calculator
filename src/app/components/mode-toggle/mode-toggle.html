@@ -1,0 +1,23 @@
+<nav class="nav" aria-label="Calculator views">
+  <ul class="group" aria-label="Modes">
+    @for (link of modes; track link.path) {
+      <li>
+        <a [routerLink]="link.path" routerLinkActive="active" ariaCurrentWhenActive="page">{{
+          link.label
+        }}</a>
+      </li>
+    }
+  </ul>
+  <div class="tools">
+    <span class="tools-label" id="tools-label">Tools</span>
+    <ul class="group" aria-labelledby="tools-label">
+      @for (link of tools; track link.path) {
+        <li>
+          <a [routerLink]="link.path" routerLinkActive="active" ariaCurrentWhenActive="page">{{
+            link.label
+          }}</a>
+        </li>
+      }
+    </ul>
+  </div>
+</nav>

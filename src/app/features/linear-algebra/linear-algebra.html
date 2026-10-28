@@ -1,0 +1,107 @@
+<div class="page-heading">
+  <h1>Matrices &amp; vectors</h1>
+  <p>
+    Write one matrix row per line (or separate rows with ;), with entries separated by spaces or
+    commas. Bracket form like [[1, 2], [3, 4]] also works, and entries may be expressions such as
+    sqrt(2) or 1/3.
+  </p>
+</div>
+
+<div class="layout">
+  <div class="inputs">
+    <section class="card" aria-labelledby="matrices-title">
+      <h2 id="matrices-title" class="card-title">Matrices</h2>
+      <div class="pair">
+        <div class="field">
+          <label for="matrix-a">Matrix A</label>
+          <textarea
+            id="matrix-a"
+            class="input"
+            rows="4"
+            spellcheck="false"
+            [value]="matrixA()"
+            (input)="matrixA.set(text($event))"
+          ></textarea>
+        </div>
+        <div class="field">
+          <label for="matrix-b">Matrix B</label>
+          <textarea
+            id="matrix-b"
+            class="input"
+            rows="4"
+            spellcheck="false"
+            [value]="matrixB()"
+            (input)="matrixB.set(text($event))"
+          ></textarea>
+        </div>
+      </div>
+      <div class="ops" role="group" aria-label="Matrix operations">
+        @for (op of matrixOperations; track op.label) {
+          <button type="button" class="btn small" [attr.aria-label]="op.aria" (click)="apply(op)">
+            {{ op.label }}
+          </button>
+        }
+      </div>
+    </section>
+
+    <section class="card" aria-labelledby="vectors-title">
+      <h2 id="vectors-title" class="card-title">Vectors</h2>
+      <div class="pair">
+        <div class="field">
+          <label for="vector-u">Vector u</label>
+          <input
+            id="vector-u"
+            class="input"
+            spellcheck="false"
+            [value]="vectorU()"
+            (input)="vectorU.set(text($event))"
+          />
+        </div>
+        <div class="field">
+          <label for="vector-v">Vector v (also used for A·v and Ax = v)</label>
+          <input
+            id="vector-v"
+            class="input"
+            spellcheck="false"
+            [value]="vectorV()"
+            (input)="vectorV.set(text($event))"
+          />
+        </div>
+      </div>
+      <div class="ops" role="group" aria-label="Vector operations">
+        @for (op of vectorOperations; track op.label) {
+          <button type="button" class="btn small" [attr.aria-label]="op.aria" (click)="apply(op)">
+            {{ op.label }}
+          </button>
+        }
+      </div>
+    </section>
+  </div>
+
+  <section class="card output" aria-labelledby="result-title" aria-live="polite">
+    <h2 id="result-title" class="card-title">
+      Result{{ resultLabel() ? ': ' + resultLabel() : '' }}
+    </h2>
+    @let r = result();
+    @if (!r) {
+      <p class="hint">Choose an operation to see the result here.</p>
+    } @else if (!r.ok) {
+      <p class="error-message" role="alert">{{ r.error }}</p>
+    } @else {
+      <div class="result-box">
+        @switch (r.kind) {
+          @case ('scalar') {
+            <span class="scalar">{{ format(r.value) }}</span>
+          }
+          @case ('vector') {
+            <span class="scalar">[{{ r.value.map(format).join(', ') }}]</span>
+          }
+          @case ('matrix') {
+            <app-matrix-view [matrix]="r.value" [label]="'Result ' + resultLabel()" />
+          }
+        }
+      </div>
+      <p class="hint">Computed in double precision; values are rounded to 10 significant digits.</p>
+    }
+  </section>
+</div>

@@ -1,0 +1,151 @@
+<div class="page-heading">
+  <h1>Calculus</h1>
+  <p>
+    Numerical derivatives, integrals, roots and limits. Every result is a floating-point
+    approximation, not a symbolic answer. Trigonometric functions use radians.
+  </p>
+</div>
+
+<section class="card fn-card">
+  <div class="field">
+    <label for="calc-fn">f(x) =</label>
+    <input
+      id="calc-fn"
+      class="input"
+      [value]="fnText()"
+      (input)="fnText.set(text($event))"
+      spellcheck="false"
+      autocomplete="off"
+      [attr.aria-invalid]="!compiled().ok"
+      aria-describedby="calc-fn-status"
+    />
+  </div>
+  @let c = compiled();
+  @if (!c.ok) {
+    <p id="calc-fn-status" class="error-message" role="alert">{{ c.error }}</p>
+  } @else {
+    <p id="calc-fn-status" class="hint">
+      Pink solid line: f(x). Blue dashed line: numerical f′(x).
+    </p>
+  }
+  <app-graph-canvas
+    class="plot"
+    [series]="series()"
+    label="Graph of f and its numerical derivative"
+  />
+</section>
+
+<div class="tool-grid">
+  <section class="card" aria-labelledby="deriv-title">
+    <h2 id="deriv-title" class="card-title">Derivative at a point</h2>
+    <form class="row" (submit)="$event.preventDefault(); computeDerivative()">
+      <div class="field">
+        <label for="deriv-x">x₀</label>
+        <input
+          id="deriv-x"
+          class="input"
+          [value]="derivPoint()"
+          (input)="derivPoint.set(text($event))"
+        />
+      </div>
+      <button type="submit" class="btn primary">Compute f′(x₀)</button>
+    </form>
+    <app-tool-result [outcome]="derivResult()" [approximate]="true" />
+  </section>
+
+  <section class="card" aria-labelledby="int-title">
+    <h2 id="int-title" class="card-title">Definite integral</h2>
+    <form class="row" (submit)="$event.preventDefault(); computeIntegral()">
+      <div class="field">
+        <label for="int-a">From a</label>
+        <input id="int-a" class="input" [value]="intFrom()" (input)="intFrom.set(text($event))" />
+      </div>
+      <div class="field">
+        <label for="int-b">To b</label>
+        <input id="int-b" class="input" [value]="intTo()" (input)="intTo.set(text($event))" />
+      </div>
+      <button type="submit" class="btn primary">Integrate</button>
+    </form>
+    <p class="hint">Adaptive Simpson's rule. Bounds must be finite.</p>
+    <app-tool-result [outcome]="intResult()" [approximate]="true" />
+  </section>
+
+  <section class="card" aria-labelledby="root-title">
+    <h2 id="root-title" class="card-title">Root finding</h2>
+    <div class="segmented" role="radiogroup" aria-label="Root finding method">
+      <button
+        type="button"
+        role="radio"
+        [attr.aria-checked]="rootMode() === 'guess'"
+        (click)="rootMode.set('guess')"
+      >
+        Newton (guess)
+      </button>
+      <button
+        type="button"
+        role="radio"
+        [attr.aria-checked]="rootMode() === 'bracket'"
+        (click)="rootMode.set('bracket')"
+      >
+        Bisection (bracket)
+      </button>
+    </div>
+    <form class="row spaced" (submit)="$event.preventDefault(); computeRoot()">
+      @if (rootMode() === 'guess') {
+        <div class="field">
+          <label for="root-guess">Initial guess</label>
+          <input
+            id="root-guess"
+            class="input"
+            [value]="rootGuess()"
+            (input)="rootGuess.set(text($event))"
+          />
+        </div>
+      } @else {
+        <div class="field">
+          <label for="root-a">a</label>
+          <input id="root-a" class="input" [value]="rootA()" (input)="rootA.set(text($event))" />
+        </div>
+        <div class="field">
+          <label for="root-b">b</label>
+          <input id="root-b" class="input" [value]="rootB()" (input)="rootB.set(text($event))" />
+        </div>
+      }
+      <button type="submit" class="btn primary">Find root</button>
+    </form>
+    <app-tool-result [outcome]="rootResult()" [approximate]="true" />
+  </section>
+
+  <section class="card" aria-labelledby="limit-title">
+    <h2 id="limit-title" class="card-title">Limit</h2>
+    <form class="row" (submit)="$event.preventDefault(); computeLimit()">
+      <div class="field">
+        <label for="limit-a">x → a</label>
+        <input
+          id="limit-a"
+          class="input"
+          [value]="limitPoint()"
+          (input)="limitPoint.set(text($event))"
+        />
+      </div>
+      <div class="field">
+        <label for="limit-dir">Direction</label>
+        <select
+          id="limit-dir"
+          class="input"
+          [value]="limitDirection()"
+          (change)="limitDirection.set($any(text($event)))"
+        >
+          <option value="both">Both sides</option>
+          <option value="left">From the left (a⁻)</option>
+          <option value="right">From the right (a⁺)</option>
+        </select>
+      </div>
+      <button type="submit" class="btn primary">Evaluate</button>
+    </form>
+    <p class="hint">
+      Use inf or -inf for limits at infinity. Sampling-based; may miss oscillating behaviour.
+    </p>
+    <app-tool-result [outcome]="limitResult()" [approximate]="true" />
+  </section>
+</div>

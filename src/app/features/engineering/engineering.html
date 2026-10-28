@@ -1,0 +1,426 @@
+<div class="page-heading">
+  <h1>Engineering &amp; robotics</h1>
+  <p>Conversions, rotations and frame transforms for physics and robotics coursework.</p>
+</div>
+
+<section class="card conventions" aria-labelledby="conventions-title">
+  <div class="conventions-head">
+    <h2 id="conventions-title" class="card-title">Conventions</h2>
+    <div class="segmented" role="radiogroup" aria-label="Angle unit for this panel">
+      <button
+        type="button"
+        role="radio"
+        [attr.aria-checked]="settings.angleMode() === 'DEG'"
+        (click)="settings.angleMode.set('DEG')"
+      >
+        DEG
+      </button>
+      <button
+        type="button"
+        role="radio"
+        [attr.aria-checked]="settings.angleMode() === 'RAD'"
+        (click)="settings.angleMode.set('RAD')"
+      >
+        RAD
+      </button>
+    </div>
+  </div>
+  <ul>
+    <li>
+      Angles below are entered in
+      <strong>{{ settings.angleMode() === 'DEG' ? 'degrees' : 'radians' }}</strong> (shared with the
+      calculator's DEG/RAD setting).
+    </li>
+    <li>
+      Right-handed frames; positive angles rotate counter-clockwise looking down the axis toward the
+      origin.
+    </li>
+    <li>Rotations are active and act on column vectors: p′ = R·p.</li>
+    <li>
+      T<sub>AB</sub> = [R t; 0 1] maps coordinates in frame B into frame A, so T<sub>AC</sub> =
+      T<sub>AB</sub> · T<sub>BC</sub>.
+    </li>
+  </ul>
+</section>
+
+<div class="tool-grid">
+  <section class="card" aria-labelledby="angle-title">
+    <h2 id="angle-title" class="card-title">Degrees ↔ radians</h2>
+    <div class="row">
+      <div class="field">
+        <label for="deg-in">Degrees</label>
+        <input id="deg-in" class="input" [value]="degrees()" (input)="degrees.set(text($event))" />
+      </div>
+      <div class="field">
+        <label for="rad-in">Radians (pi allowed)</label>
+        <input id="rad-in" class="input" [value]="radians()" (input)="radians.set(text($event))" />
+      </div>
+    </div>
+    @let d2r = degToRad();
+    @let r2d = radToDeg();
+    <div class="result-box">
+      <div>{{ degrees() }}° = {{ d2r.ok ? fmt(d2r.value) : '—' }} rad</div>
+      <div>{{ radians() }} rad = {{ r2d.ok ? fmt(r2d.value) : '—' }}°</div>
+    </div>
+    @if (!d2r.ok) {
+      <p class="error-message" role="alert">{{ d2r.error }}</p>
+    }
+    @if (!r2d.ok) {
+      <p class="error-message" role="alert">{{ r2d.error }}</p>
+    }
+  </section>
+
+  <section class="card" aria-labelledby="polar-title">
+    <h2 id="polar-title" class="card-title">Cartesian ↔ polar</h2>
+    <div class="row">
+      <div class="field">
+        <label for="cart-x">x</label>
+        <input id="cart-x" class="input" [value]="cartX()" (input)="cartX.set(text($event))" />
+      </div>
+      <div class="field">
+        <label for="cart-y">y</label>
+        <input id="cart-y" class="input" [value]="cartY()" (input)="cartY.set(text($event))" />
+      </div>
+    </div>
+    @let p = toPolar();
+    @if (p.ok) {
+      <div class="result-box">
+        r = {{ fmt(p.value.r) }}, θ = {{ fmt(p.value.theta) }}{{ unitLabel() }}
+      </div>
+    } @else {
+      <p class="error-message" role="alert">{{ p.error }}</p>
+    }
+    <div class="row spaced">
+      <div class="field">
+        <label for="polar-r">r</label>
+        <input id="polar-r" class="input" [value]="polarR()" (input)="polarR.set(text($event))" />
+      </div>
+      <div class="field">
+        <label for="polar-t">θ ({{ unitLabel() }})</label>
+        <input
+          id="polar-t"
+          class="input"
+          [value]="polarTheta()"
+          (input)="polarTheta.set(text($event))"
+        />
+      </div>
+    </div>
+    @let cxy = toCartesian();
+    @if (cxy.ok) {
+      <div class="result-box">x = {{ fmt(cxy.value.x) }}, y = {{ fmt(cxy.value.y) }}</div>
+    } @else {
+      <p class="error-message" role="alert">{{ cxy.error }}</p>
+    }
+  </section>
+
+  <section class="card" aria-labelledby="vector-title">
+    <h2 id="vector-title" class="card-title">Vector magnitude &amp; direction</h2>
+    <div class="row">
+      <div class="field">
+        <label for="vec-x">x</label>
+        <input id="vec-x" class="input" [value]="vx()" (input)="vx.set(text($event))" />
+      </div>
+      <div class="field">
+        <label for="vec-y">y</label>
+        <input id="vec-y" class="input" [value]="vy()" (input)="vy.set(text($event))" />
+      </div>
+      <div class="field">
+        <label for="vec-z">z</label>
+        <input id="vec-z" class="input" [value]="vz()" (input)="vz.set(text($event))" />
+      </div>
+    </div>
+    @let vi = vectorInfo();
+    @if (vi.ok) {
+      <div class="result-box">
+        <div>|v| = {{ fmt(vi.value.magnitude) }}</div>
+        @if (vi.value.unit && vi.value.angles) {
+          <div>v̂ = [{{ vi.value.unit.map(fmt).join(', ') }}]</div>
+          <div>
+            Direction angles (α, β, γ) = ({{ vi.value.angles.map(fmt).join(', ') }}){{
+              unitLabel()
+            }}
+          </div>
+        }
+      </div>
+      <p class="hint">
+        Set z = 0 for 2D vectors. Direction angles are measured from the x, y and z axes.
+      </p>
+    } @else {
+      <p class="error-message" role="alert">{{ vi.error }}</p>
+    }
+  </section>
+
+  <section class="card" aria-labelledby="rotation-title">
+    <h2 id="rotation-title" class="card-title">Rotation matrices</h2>
+    <div class="row">
+      <div class="field">
+        <label for="rot-theta">θ ({{ unitLabel() }})</label>
+        <input
+          id="rot-theta"
+          class="input"
+          [value]="rotTheta()"
+          (input)="rotTheta.set(text($event))"
+        />
+      </div>
+      <div class="field">
+        <label for="rot-axis">3D axis</label>
+        <select
+          id="rot-axis"
+          class="input"
+          [value]="rotAxis()"
+          (change)="rotAxis.set($any(text($event)))"
+        >
+          <option value="x">x</option>
+          <option value="y">y</option>
+          <option value="z">z</option>
+        </select>
+      </div>
+    </div>
+    @let rot = rotation();
+    @if (rot.ok) {
+      <div class="matrices">
+        <div>
+          <p class="matrix-caption">R(θ), 2D</p>
+          <app-matrix-view [matrix]="rot.value.r2" label="2D rotation matrix" />
+        </div>
+        <div>
+          <p class="matrix-caption">
+            R<sub>{{ rotAxis() }}</sub
+            >(θ), 3D
+          </p>
+          <app-matrix-view [matrix]="rot.value.r3" label="3D rotation matrix" />
+        </div>
+      </div>
+    }
+    <h3 class="sub-title">Rotate a 2D point</h3>
+    <div class="row">
+      <div class="field">
+        <label for="pt-x">x</label>
+        <input id="pt-x" class="input" [value]="pointX()" (input)="pointX.set(text($event))" />
+      </div>
+      <div class="field">
+        <label for="pt-y">y</label>
+        <input id="pt-y" class="input" [value]="pointY()" (input)="pointY.set(text($event))" />
+      </div>
+    </div>
+    @if (rot.ok) {
+      <div class="result-box">
+        R(θ)·({{ pointX() }}, {{ pointY() }}) = ({{ fmt(rot.value.rotated.x) }},
+        {{ fmt(rot.value.rotated.y) }})
+      </div>
+    } @else {
+      <p class="error-message" role="alert">{{ rot.error }}</p>
+    }
+  </section>
+
+  <section class="card wide" aria-labelledby="transform-title">
+    <h2 id="transform-title" class="card-title">Homogeneous transforms</h2>
+    <p class="hint">Each frame is a rotation about one axis followed by a translation t.</p>
+    <div class="frames">
+      @for (
+        frame of [
+          { id: 'AB', name: 'T_AB', value: frameAB() },
+          { id: 'BC', name: 'T_BC', value: frameBC() },
+        ];
+        track frame.id
+      ) {
+        <fieldset class="frame">
+          <legend>{{ frame.name }}</legend>
+          <div class="row">
+            <div class="field">
+              <label [for]="'axis-' + frame.id">Axis</label>
+              <select
+                class="input"
+                [id]="'axis-' + frame.id"
+                [value]="frame.value.axis"
+                (change)="updateFrame($any(frame.id), 'axis', text($event))"
+              >
+                <option value="x">x</option>
+                <option value="y">y</option>
+                <option value="z">z</option>
+              </select>
+            </div>
+            <div class="field">
+              <label [for]="'theta-' + frame.id">θ ({{ unitLabel() }})</label>
+              <input
+                class="input"
+                [id]="'theta-' + frame.id"
+                [value]="frame.value.theta"
+                (input)="updateFrame($any(frame.id), 'theta', text($event))"
+              />
+            </div>
+          </div>
+          <div class="row">
+            @for (k of ['tx', 'ty', 'tz']; track k) {
+              <div class="field">
+                <label [for]="k + '-' + frame.id">{{ k }}</label>
+                <input
+                  class="input"
+                  [id]="k + '-' + frame.id"
+                  [value]="$any(frame.value)[k]"
+                  (input)="updateFrame($any(frame.id), $any(k), text($event))"
+                />
+              </div>
+            }
+          </div>
+        </fieldset>
+      }
+    </div>
+    <div class="row spaced">
+      <div class="field">
+        <label for="point-c">Point p<sub>C</sub> (x, y, z) in frame C</label>
+        <input id="point-c" class="input" [value]="pointC()" (input)="pointC.set(text($event))" />
+      </div>
+    </div>
+    @let tf = transforms();
+    @if (tf.ok) {
+      <div class="matrices">
+        <div>
+          <p class="matrix-caption">T<sub>AB</sub></p>
+          <app-matrix-view [matrix]="tf.value.tAB" label="Transform A to B" />
+        </div>
+        <div>
+          <p class="matrix-caption">T<sub>BC</sub></p>
+          <app-matrix-view [matrix]="tf.value.tBC" label="Transform B to C" />
+        </div>
+        <div>
+          <p class="matrix-caption">T<sub>AC</sub> = T<sub>AB</sub> · T<sub>BC</sub></p>
+          <app-matrix-view [matrix]="tf.value.tAC" label="Composed transform A to C" />
+        </div>
+      </div>
+      <div class="result-box">
+        p<sub>A</sub> = T<sub>AC</sub> · p<sub>C</sub> = ({{ tf.value.pA.map(fmt).join(', ') }})
+      </div>
+    } @else {
+      <p class="error-message" role="alert">{{ tf.error }}</p>
+    }
+  </section>
+
+  <section class="card" aria-labelledby="angular-title">
+    <h2 id="angular-title" class="card-title">Angular velocity</h2>
+    <div class="row">
+      <div class="field">
+        <label for="ang-value">Value</label>
+        <input
+          id="ang-value"
+          class="input"
+          [value]="angularValue()"
+          (input)="angularValue.set(text($event))"
+        />
+      </div>
+      <div class="field">
+        <label for="ang-unit">Unit</label>
+        <select id="ang-unit" class="input" (change)="angularFrom.set($any(text($event)))">
+          @for (u of angularUnits; track u) {
+            <option [value]="u" [selected]="u === angularFrom()">{{ u }}</option>
+          }
+        </select>
+      </div>
+    </div>
+    @let av = angular();
+    @if (av.ok) {
+      <table class="conversions">
+        <tbody>
+          @for (row of av.value; track row.unit) {
+            <tr>
+              <th scope="row">{{ row.unit }}</th>
+              <td>{{ fmt(row.value) }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    } @else {
+      <p class="error-message" role="alert">{{ av.error }}</p>
+    }
+  </section>
+
+  <section class="card" aria-labelledby="units-title">
+    <h2 id="units-title" class="card-title">Unit conversion</h2>
+    <div class="field">
+      <label for="unit-cat">Quantity</label>
+      <select id="unit-cat" class="input" (change)="selectCategory(+text($event))">
+        @for (cat of categories; track cat.name; let i = $index) {
+          <option [value]="i" [selected]="i === categoryIndex()">{{ cat.name }}</option>
+        }
+      </select>
+    </div>
+    <div class="row spaced">
+      <div class="field">
+        <label for="unit-value">Value</label>
+        <input
+          id="unit-value"
+          class="input"
+          [value]="unitValue()"
+          (input)="unitValue.set(text($event))"
+        />
+      </div>
+      <div class="field">
+        <label for="unit-from">From</label>
+        <select id="unit-from" class="input" (change)="unitFrom.set(text($event))">
+          @for (u of category().units; track u.id) {
+            <option [value]="u.id" [selected]="u.id === unitFrom()">{{ u.label }}</option>
+          }
+        </select>
+      </div>
+      <div class="field">
+        <label for="unit-to">To</label>
+        <select id="unit-to" class="input" (change)="unitTo.set(text($event))">
+          @for (u of category().units; track u.id) {
+            <option [value]="u.id" [selected]="u.id === unitTo()">{{ u.label }}</option>
+          }
+        </select>
+      </div>
+    </div>
+    @let ur = unitResult();
+    @if (ur.ok) {
+      <div class="result-box">
+        {{ unitValue() }} {{ unitFrom() }} = {{ fmt(ur.value) }} {{ unitTo() }}
+      </div>
+    } @else {
+      <p class="error-message" role="alert">{{ ur.error }}</p>
+    }
+  </section>
+
+  <section class="card wide" aria-labelledby="constants-title">
+    <h2 id="constants-title" class="card-title">Physical constants</h2>
+    <div class="table-scroll">
+      <table class="constants">
+        <thead>
+          <tr>
+            <th scope="col">Symbol</th>
+            <th scope="col">Name</th>
+            <th scope="col">Value</th>
+            <th scope="col">Unit</th>
+            <th scope="col"><span class="sr-only">Copy</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (c of constants; track c.symbol) {
+            <tr>
+              <th scope="row" class="symbol">{{ c.symbol }}</th>
+              <td>
+                {{ c.name }}
+                @if (c.exact) {
+                  <span class="approx-badge">exact</span>
+                }
+              </td>
+              <td class="mono">{{ fmt(c.value) }}</td>
+              <td class="mono">{{ c.unit }}</td>
+              <td>
+                <button
+                  type="button"
+                  class="btn small"
+                  (click)="copyConstant(c.symbol, c.value)"
+                  [attr.aria-label]="'Copy value of ' + c.name"
+                >
+                  {{ copiedSymbol() === c.symbol ? 'Copied' : 'Copy' }}
+                </button>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+    <p class="hint">CODATA 2018 recommended values. “exact” marks values fixed by SI definition.</p>
+  </section>
+</div>
